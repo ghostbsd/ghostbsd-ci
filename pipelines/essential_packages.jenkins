@@ -4,7 +4,11 @@ pipeline {
     stage('start test ') {
       steps {
         sh 'pytest -v --junitxml results/essential_packages.xml tests/essential_packages.py'
-        junit 'results/*.xml'
+      }
+      post {
+        always {
+          junit 'results/essential_packages.xml'
+        }
       }
     }
   }
