@@ -1,0 +1,4 @@
+# To not commit python cache and core dump
+.pytest_cache
+__pycache__
+*.core
