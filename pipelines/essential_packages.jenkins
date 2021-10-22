@@ -1,7 +1,7 @@
 pipeline {
   agent { label 'BUILDER2' }
   stages {
-    stage('start test ') {
+    stage('start test essential packages') {
       steps {
         sh 'pytest -v --junitxml results/essential_packages.xml tests/essential_packages.py || true'
       }
