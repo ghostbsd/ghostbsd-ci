@@ -1,0 +1,15 @@
+pipeline {
+  agent { label 'BUILDER2' }
+  stages {
+    stage('Build GhostBSD from unstable packages') {
+      steps {
+        sh "chflags -R noschg /usr/local/ghostbsd-build/ || true"
+        sh "rm -rf /usr/local/ghostbsd-build || true"
+        sh "rm -rf ghostbsd-build || true"
+        sh "git clone --single-branch --depth=1 -b master https://github.com/ghostbsd/ghostbsd-build.git"
+        sh "./build.sh -d mate -b unstable"
+        archiveArtifacts artifacts: "/usr/local/ghostbsd-build/iso/*", fingerprint: true
+      }
+    }
+  }
+}
