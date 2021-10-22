@@ -7,7 +7,7 @@ pipeline {
         sh "rm -rf /usr/local/ghostbsd-build || true"
         sh "rm -rf ghostbsd-build || true"
         sh "git clone --single-branch --depth=1 -b master https://github.com/ghostbsd/ghostbsd-build.git"
-        sh "./build.sh -d mate -b unstable"
+        sh "cd ghostbsd-build ; ./build.sh -d mate -b unstable"
         archiveArtifacts artifacts: "/usr/local/ghostbsd-build/iso/*", fingerprint: true
       }
     }
