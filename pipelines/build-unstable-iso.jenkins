@@ -9,7 +9,7 @@ pipeline {
         sh "git clone --single-branch --depth=1 -b master https://github.com/ghostbsd/ghostbsd-build.git"
         sh "cd ghostbsd-build ; ./build.sh -d mate -b unstable"
         sh "mkdir artifacts"
-        sh cp "/usr/local/ghostbsd-build/iso/* artifacts/"
+        sh "cp /usr/local/ghostbsd-build/iso/* artifacts/"
         archiveArtifacts artifacts: "artifacts/**", fingerprint: false
       }
     }
