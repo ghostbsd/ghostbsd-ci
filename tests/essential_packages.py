@@ -17,7 +17,7 @@ iso_os_packages = [
     "os-generic-userland-devtools"
 ]
 packages_list = os.listdir(repos)
-useful_packages = open('useful_packages', 'r').read().splitlines()
+useful_packages = open('tests/useful_packages', 'r').read().splitlines()
 
 
 @pytest.mark.parametrize('package', iso_os_packages)
