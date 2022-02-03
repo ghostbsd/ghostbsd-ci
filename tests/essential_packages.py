@@ -17,6 +17,7 @@ iso_os_packages = [
     "os-generic-userland-devtools"
 ]
 packages_list = os.listdir(repos)
+useful_packages = open('useful_packages', 'r').read().splitlines()
 
 
 @pytest.mark.parametrize('package', iso_os_packages)
@@ -34,7 +35,14 @@ def test_02_verify_ghostbsd_packages_iso_exists(package):
 
 
 @pytest.mark.parametrize('package', xfce_iso_packages)
-def test_03_verify_ghostbs_xfce_packages_iso_exists(package):
+def test_03_verify_ghostbsd_xfce_packages_iso_exists(package):
+    regex = re.compile(f'({package}-)([0-9]|v[0-9]|g[0-9]).+')
+    found = list(filter(regex.match, packages_list))
+    assert found, f'{package} is missing'
+
+
+@pytest.mark.parametrize('package', useful_packages)
+def test_04_verify_ghostbsd_useful_packages_exists(package):
     regex = re.compile(f'({package}-)([0-9]|v[0-9]|g[0-9]).+')
     found = list(filter(regex.match, packages_list))
     assert found, f'{package} is missing'
