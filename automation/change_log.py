@@ -60,7 +60,7 @@ Bug += '</ul>\n'
 Security += '</ul>\n'
 
 file = open('change-log.html', 'w')
-file.writelines('<h2>version Change Log<h2>\n')
+file.writelines('<h2>[version] Changelog<h2>\n')
 file.writelines(Epic)
 file.writelines(Feature)
 file.writelines(Bug)
