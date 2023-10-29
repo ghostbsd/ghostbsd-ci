@@ -14,10 +14,10 @@ issues_text = re.search(rf'(.*?{search}.*?)\n', raw_page).group(1)
 
 issues = json.loads(issues_text.replace(search, '').replace('</script>', ''))
 
-Epic = '<h3>Epic</h3>\n<ul>\n'
-Feature = '<h3>New Feature and Improvement</h3>\n<ul>\n'
-Bug = '<h3>Bug fix</h3>\n<ul>\n'
-Security = '<h3>Security fix</h3>\n<ul>\n'
+Epic = '<h3>Epics</h3>\n<ul>\n'
+Feature = '<h3>New Features and Improvements</h3>\n<ul>\n'
+Bug = '<h3>Bug Fixes</h3>\n<ul>\n'
+Security = '<h3>Security Fixes</h3>\n<ul>\n'
 
 for issue in issues:
     if issue['memexProjectColumnValues'][0]['value']['state'] in ['closed', 'merged']:
