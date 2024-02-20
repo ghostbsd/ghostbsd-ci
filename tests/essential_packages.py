@@ -5,7 +5,7 @@ import pytest
 import re
 import requests
 
-repos = '/zroot/poudriere/data/packages/ghostbsd-13-ghostbsd_ports/.latest/All'
+repos = '/zroot/poudriere/data/packages/ghostbsd-14-ghostbsd_ports/.latest/All'
 raw_url = 'https://raw.githubusercontent.com/ghostbsd/ghostbsd-build' \
     '/master/packages'
 mate_iso_packages = requests.get(f'{raw_url}/mate').text.split()
