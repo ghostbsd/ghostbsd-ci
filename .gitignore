@@ -3,3 +3,6 @@
 __pycache__
 *.core
 change-log.html
+# Editor directories and files
+.vscode/
+.idea/.idea
