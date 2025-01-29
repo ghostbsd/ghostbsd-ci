@@ -5,4 +5,4 @@ __pycache__
 change-log.html
 # Editor directories and files
 .vscode/
-.idea/.idea
+.idea/
