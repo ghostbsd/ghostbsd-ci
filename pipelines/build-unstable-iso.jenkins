@@ -1,7 +1,7 @@
 pipeline {
   agent { label 'BUILDER2' }
   stages {
-    stage('Build GhostBSD from unstable packages') {
+    stage('Build GhostBSD MATE from unstable packages') {
       steps {
         sh "chflags -R noschg /usr/local/ghostbsd-build/ || true"
         sh "rm -rf /usr/local/ghostbsd-build || true"
@@ -9,6 +9,19 @@ pipeline {
         sh "rm -rf artifacts || true"
         sh "git clone --single-branch --depth=1 -b master https://github.com/ghostbsd/ghostbsd-build.git"
         sh "cd ghostbsd-build ; ./build.sh -d mate -b unstable"
+        sh "mkdir -p artifacts"
+        sh "cp /usr/local/ghostbsd-build/iso/* artifacts/"
+        archiveArtifacts artifacts: "artifacts/**", fingerprint: false
+      }
+    }
+    stage('Build GhostBSD XFCE from unstable packages') {
+      steps {
+        sh "chflags -R noschg /usr/local/ghostbsd-build/ || true"
+        sh "rm -rf /usr/local/ghostbsd-build || true"
+        sh "rm -rf ghostbsd-build || true"
+        sh "rm -rf artifacts || true"
+        sh "git clone --single-branch --depth=1 -b master https://github.com/ghostbsd/ghostbsd-build.git"
+        sh "cd ghostbsd-build ; ./build.sh -d xfce -b unstable"
         sh "mkdir -p artifacts"
         sh "cp /usr/local/ghostbsd-build/iso/* artifacts/"
         archiveArtifacts artifacts: "artifacts/**", fingerprint: false
