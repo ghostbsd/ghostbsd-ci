@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'BUILDER2' }
+  agent { label 'builder1' }
   stages {
     stage('start test essential packages') {
       steps {
