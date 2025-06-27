@@ -12,4 +12,5 @@ signal-desktop
 telegram-desktop
 terminator
 tmux
+vscode
 wget
