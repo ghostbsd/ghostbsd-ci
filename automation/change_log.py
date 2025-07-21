@@ -8,18 +8,37 @@ issues_completed_url = 'https://github.com/orgs/ghostbsd/projects/4/views/17'
 
 raw_page = requests.get(issues_completed_url).text
 
-search = '<script type="application/json" id="memex-items-data">'
+# search = '<script type="application/json" id="memex-items-data">'
+items_pattern = r'<script type="application/json" id="memex-items-data">(.*?)</script>'
+columns_pattern = r'<script type="application/json" id="memex-columns-data">(.*?)</script>'
 
-issues_text = re.search(rf'(.*?{search}.*?)\n', raw_page).group(1)
+# issues_text = re.search(rf'(.*?{search}.*?)\n', raw_page).group(1)
 
-issues = json.loads(issues_text.replace(search, '').replace('</script>', ''))
+columns_text = re.search(columns_pattern, raw_page).group(1)
+columns_data = json.loads(columns_text)
+
+items_text = re.search(items_pattern, raw_page).group(1)
+items_data = json.loads(items_text)
+
+#issues = json.loads(issues_text.replace(search, '').replace('</script>', ''))
 
 Epic = '<h3>Epics</h3>\n<ul>\n'
 Feature = '<h3>Enhancement, Improvements and New Features</h3>\n<ul>\n'
 Bug = '<h3>Bug Fixes</h3>\n<ul>\n'
 Security = '<h3>Security Fixes</h3>\n<ul>\n'
 
-for issue in issues:
+for column in columns_data:
+    if column['name'] == 'Release':
+        print(column['name'])
+        print(column['id']) # 58331422
+        # print(json.dumps(column, indent=4))
+        # exit()
+        for obj in column['settings']['configuration']['iterations']:
+            print(obj['id'], ': ', obj['title'])
+
+for items in items_data:
+    print(json.dumps(items, indent=4))
+    exit()
     if issue['memexProjectColumnValues'][0]['value']['state'] in ['closed', 'merged']:
         # issues_completed.append(issue)
         # print(issue['contentType'])
