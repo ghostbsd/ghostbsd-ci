@@ -1,9 +1,12 @@
 pipeline {
   agent { label 'builder1' }
+  environment {
+    GHOSTBSD_VERSION = 'unstable'
+  }
   stages {
     stage('start test essential packages') {
       steps {
-        sh 'pytest -v --junitxml results/essential_packages.xml tests/essential_packages.py --version=unstable || true'
+        sh 'pytest -v --junitxml results/essential_packages.xml tests/essential_packages.py || true'
       }
       post {
         always {
