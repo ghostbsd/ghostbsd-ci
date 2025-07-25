@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('start test essential packages') {
       steps {
-        sh 'pytest -v --junitxml results/essential_packages.xml tests/essential_packages.py --version=14 || true'
+        sh 'pytest -v --junitxml results/essential_packages.xml tests/essential_packages.py --version=unstable || true'
       }
       post {
         always {
