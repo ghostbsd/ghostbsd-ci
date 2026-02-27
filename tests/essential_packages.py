@@ -5,7 +5,7 @@ import re
 import requests
 
 # Get version from environment variable, default to '14'
-version = os.environ.get('GHOSTBSD_VERSION', '14')
+version = os.environ.get('GHOSTBSD_VERSION', '15')
 
 repos = f'/usr/local/poudriere/data/packages/ghostbsd-{version}-ghostbsd_ports/.latest/All'
 raw_url = 'https://raw.githubusercontent.com/ghostbsd/ghostbsd-build/master/packages'

@@ -1,7 +1,7 @@
 pipeline {
   agent { label 'builder1' }
   environment {
-    GHOSTBSD_VERSION = '14'
+    GHOSTBSD_VERSION = '15'
   }
   stages {
     stage('start test essential packages') {
