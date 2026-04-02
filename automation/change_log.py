@@ -1,16 +1,18 @@
 #!/usr/bin/env python
+"""Generate HTML and Markdown changelogs from GitHub project data."""
 
+import sys
 import os
 import requests
 
 # GitHub GraphQL endpoint
-api_url = "https://api.github.com/graphql"
+API_URL = "https://api.github.com/graphql"
 
 # Get token from environment
 token = os.getenv("GITHUB_TOKEN")
 if not token:
     print("Set GITHUB_TOKEN environment variable")
-    exit(1)
+    sys.exit(1)
 
 # Headers
 headers = {
@@ -20,7 +22,7 @@ headers = {
 }
 
 # Simple GraphQL query without nested nodes
-query = """
+QUERY = """
 query($cursor: String) {
   organization(login: "ghostbsd") {
     projectV2(number: 4) {
@@ -35,6 +37,9 @@ query($cursor: String) {
               number
               title
               url
+              author {
+                login
+              }
               issueType {
                 id
                 name
@@ -58,6 +63,9 @@ query($cursor: String) {
               number
               title
               url
+              author {
+                login
+              }
               assignees(first: 10) {
                 nodes {
                   login
@@ -103,11 +111,11 @@ query($cursor: String) {
 
 # Fetch all pages
 all_items = []
-cursor = None
+CURSOR = None
 
 while True:
-    variables = {"cursor": cursor}
-    response = requests.post(api_url, json={"query": query, "variables": variables}, headers=headers)
+    variables = {"cursor": CURSOR}
+    response = requests.post(API_URL, json={"query": QUERY, "variables": variables}, headers=headers, timeout=30)
     data = response.json()
 
     if "errors" in data:
@@ -122,9 +130,10 @@ while True:
     if not items_data["pageInfo"]["hasNextPage"]:
         break
 
-    cursor = items_data["pageInfo"]["endCursor"]
+    CURSOR = items_data["pageInfo"]["endCursor"]
 
 print(f"Found {len(all_items)} total items")
+
 
 def get_field_value(project_item, field_name):
     """Get project field value by name"""
@@ -133,11 +142,13 @@ def get_field_value(project_item, field_name):
             return node.get("name") or node.get("title") or node.get("text")
     return None
 
+
 def get_issue_type(project_item):
     """Get issue type from either issueType or project fields"""
     if project_item.get("content", {}).get("issueType"):
         return project_item["content"]["issueType"]["name"]
     return get_field_value(project_item, "Issue Type")
+
 
 def build_item_line(project_item):
     """Build HTML line for changelog item"""
@@ -148,63 +159,110 @@ def build_item_line(project_item):
     title = content["title"]
     return f'<a href="{url}">{repository}#{number}</a> {title}'
 
+
+def build_item_line_md(project_item):
+    """Build Markdown line for changelog item"""
+    content = project_item["content"]
+    url = content["url"]
+    repository = content["repository"]["nameWithOwner"]
+    number = content["number"]
+    title = content["title"]
+    return f'[{repository}#{number}]({url}) {title}'
+
+
 def categorize_item(type_name):
     """Determine which changelog section an item belongs to"""
     if type_name in ['Bug']:
         return 'Bug'
-    elif type_name in ['Security']:
+    if type_name in ['Security']:
         return 'Security'
-    elif type_name in ['Enhancement', 'Feature', 'Task']:
-        return 'Feature'
-    elif type_name in ['Epic']:
+    if type_name in ['Epic']:
         return 'Epic'
-    else:
-        return 'Feature'  # Default
+    return 'Feature'
 
-release = '25.02-R14.3p0'
 
-Epic = '<h3>Epics</h3>\n<ul>\n'
-Feature = '<h3>Enhancement, Improvements and New Features</h3>\n<ul>\n'
-Bug = '<h3>Bug Fixes</h3>\n<ul>\n'
-Security = '<h3>Security Fixes</h3>\n<ul>\n'
+RELEASE = '26.01-R15.0p2'
+
+EPIC = '<h3>Epics</h3>\n<ul>\n'
+FEATURE = '<h3>Enhancement, Improvements and New Features</h3>\n<ul>\n'
+BUG = '<h3>Bug Fixes</h3>\n<ul>\n'
+SECURITY = '<h3>Security Fixes</h3>\n<ul>\n'
+
+EPIC_MD = '### Epics\n\n'
+FEATURE_MD = '### Enhancement, Improvements and New Features\n\n'
+BUG_MD = '### Bug Fixes\n\n'
+SECURITY_MD = '### Security Fixes\n\n'
+
+DO_NOT_LIST = {'ericbsd'}
+
+ISSUE_AUTHORS = set()
+PR_AUTHORS = set()
 
 # Process all items
 for item in all_items:
     # Skip items without content
     if not item.get("content"):
         continue
-    
+
     # Check if item is for target release
     release_field = get_field_value(item, "Release")
-    if release_field != release:
+    if release_field != RELEASE:
         continue
-    
-    # Build the changelog line
-    line = build_item_line(item)
-    
-    # Get issue type and determine item type (Issue/PR)
-    issue_type = get_issue_type(item)
-    item_type = "Issue" if "issueType" in item["content"] else "PR"
-    
-    # Categorize and add to appropriate section
-    category = categorize_item(issue_type)
-    
-    if category == 'Bug':
-        Bug += f'<li>\n{item_type}: {line}\n</li>\n'
-    elif category == 'Security':
-        Security += f'<li>\n{item_type}: {line}\n</li>\n'
-    elif category == 'Epic':
-        Epic += f'<li>\n{item_type}: {line}\n</li>\n'
-    else:  # Feature
-        Feature += f'<li>\n{item_type}: {line}\n</li>\n'
 
-Epic += '</ul>\n'
-Feature += '</ul>\n'
-Bug += '</ul>\n'
-Security += '</ul>\n'
-with open('change-log.html', 'w') as file:
-    file.writelines('<h2>25.02-R14.3p0 Changelog</h2>\n')
-    file.writelines(Epic)
-    file.writelines(Feature)
-    file.writelines(Bug)
-    file.writelines(Security)
+    # Collect author by type
+    AUTHOR = item["content"].get("author", {})
+    if AUTHOR and AUTHOR.get("login") and AUTHOR["login"] not in DO_NOT_LIST:
+        if "issueType" in item["content"]:
+            ISSUE_AUTHORS.add(AUTHOR["login"])
+        else:
+            PR_AUTHORS.add(AUTHOR["login"])
+
+    # Build the changelog lines
+    LINE = build_item_line(item)
+    LINE_MD = build_item_line_md(item)
+
+    # Get issue type and determine item type (Issue/PR)
+    ISSUE_TYPE = get_issue_type(item)
+    ITEM_TYPE = "Issue" if "issueType" in item["content"] else "PR"
+
+    # Categorize and add to appropriate section
+    CATEGORY = categorize_item(ISSUE_TYPE)
+
+    if CATEGORY == 'Bug':
+        BUG += f'<li>\n{ITEM_TYPE}: {LINE}\n</li>\n'
+        BUG_MD += f'- {ITEM_TYPE}: {LINE_MD}\n'
+    elif CATEGORY == 'Security':
+        SECURITY += f'<li>\n{ITEM_TYPE}: {LINE}\n</li>\n'
+        SECURITY_MD += f'- {ITEM_TYPE}: {LINE_MD}\n'
+    elif CATEGORY == 'Epic':
+        EPIC += f'<li>\n{ITEM_TYPE}: {LINE}\n</li>\n'
+        EPIC_MD += f'- {ITEM_TYPE}: {LINE_MD}\n'
+    else:  # Feature
+        FEATURE += f'<li>\n{ITEM_TYPE}: {LINE}\n</li>\n'
+        FEATURE_MD += f'- {ITEM_TYPE}: {LINE_MD}\n'
+
+EPIC += '</ul>\n'
+FEATURE += '</ul>\n'
+BUG += '</ul>\n'
+SECURITY += '</ul>\n'
+
+with open('change-log.html', 'w', encoding='utf-8') as file:
+    file.writelines(f'<h2>{RELEASE} Changelog</h2>\n')
+    file.writelines(EPIC)
+    file.writelines(FEATURE)
+    file.writelines(BUG)
+    file.writelines(SECURITY)
+
+with open('change-log.md', 'w', encoding='utf-8') as file:
+    file.write(f'## {RELEASE} Changelog\n\n')
+    file.write(EPIC_MD + '\n')
+    file.write(FEATURE_MD + '\n')
+    file.write(BUG_MD + '\n')
+    file.write(SECURITY_MD + '\n')
+
+ISSUE_LIST = ", ".join(sorted(ISSUE_AUTHORS))
+PR_LIST = ", ".join(sorted(PR_AUTHORS))
+
+with open('contributors.html', 'w', encoding='utf-8') as file:
+    file.write(f'<p>Thanks to (Github users): {ISSUE_LIST} for reporting issues.</p>\n')
+    file.write(f'<p>Thanks to (Github users): {PR_LIST} for contributing.</p>\n')
