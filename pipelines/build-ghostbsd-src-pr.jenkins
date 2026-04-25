@@ -29,4 +29,12 @@ pipeline {
             }
         }
     }
+
+    post {
+        success {
+            ws(customWs) {
+                deleteDir()
+            }
+        }
+    }
 }
