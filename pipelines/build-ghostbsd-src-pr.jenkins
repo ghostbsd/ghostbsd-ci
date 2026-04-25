@@ -4,7 +4,7 @@ pipeline {
     agent {
         node {
             label 'builder1'
-            customWorkspace "${env.JENKINS_HOME}/workspace/${env.JOB_BASE_NAME}/${safeBranch}"
+            customWorkspace "${env.JENKINS_AGENT_WORKDIR}/workspace/${currentBuild.fullProjectName.split('/')[0]}/${safeBranch}"
         }
     }
 
