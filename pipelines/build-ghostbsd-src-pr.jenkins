@@ -1,5 +1,12 @@
+def safeBranch = env.BRANCH_NAME.replaceAll('[/#]', '-')
+
 pipeline {
-    agent { label 'builder1' }
+    agent {
+        node {
+            label 'builder1'
+            customWorkspace "${env.JENKINS_HOME}/workspace/${env.JOB_BASE_NAME}/${safeBranch}
+        }
+    }
 
     options {
         timestamps()
