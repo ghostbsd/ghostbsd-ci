@@ -1,8 +1,14 @@
+def customWs
+
+node('builder1') {
+    customWs = env.WORKSPACE.replaceAll('%2F', '-').replaceAll('%23', '-')
+}
+
 pipeline {
     agent {
         node {
             label 'builder1'
-            // customWorkspace env.WORKSPACE.replaceAll('%2F', '-').replaceAll('%23', '-')
+            customWorkspace customWs
         }
     }
 
@@ -13,28 +19,14 @@ pipeline {
     stages {
         stage('Clean') {
             steps {
-                sh 'env | sort'
-                // sh 'make clean'
+                sh 'make clean'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Build skipped'
-                // sh 'make -j24 buildworld buildkernel'
+                sh 'make -j24 buildworld buildkernel'
             }
-        }
-    }
-
-    post {
-        success {
-            githubNotify status: 'SUCCESS', description: 'Build passed'
-        }
-        failure {
-            githubNotify status: 'FAILURE', description: 'Build failed'
-        }
-        aborted {
-            githubNotify status: 'ERROR', description: 'Build aborted'
         }
     }
 }
