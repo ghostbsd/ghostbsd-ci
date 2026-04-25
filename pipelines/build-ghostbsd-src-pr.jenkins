@@ -1,10 +1,8 @@
-def safeBranch = env.BRANCH_NAME.replaceAll('[/#]', '-')
-
 pipeline {
     agent {
         node {
             label 'builder1'
-            customWorkspace "${env.JENKINS_AGENT_WORKDIR}/workspace/${currentBuild.fullProjectName.split('/')[0]}/${safeBranch}"
+            customWorkspace env.WORKSPACE.replaceAll('%2F', '-').replaceAll('%23', '-')
         }
     }
 
