@@ -2,7 +2,7 @@ pipeline {
     agent {
         node {
             label 'builder1'
-            customWorkspace env.WORKSPACE.replaceAll('%2F', '-').replaceAll('%23', '-')
+            // customWorkspace env.WORKSPACE.replaceAll('%2F', '-').replaceAll('%23', '-')
         }
     }
 
@@ -13,13 +13,14 @@ pipeline {
     stages {
         stage('Clean') {
             steps {
-                sh 'make clean'
+                sh 'env | sort'
+                // sh 'make clean'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'make -j24 buildworld buildkernel'
+                // sh 'make -j24 buildworld buildkernel'
             }
         }
     }
