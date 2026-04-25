@@ -20,6 +20,7 @@ pipeline {
 
         stage('Build') {
             steps {
+                echo 'Build skipped'
                 // sh 'make -j24 buildworld buildkernel'
             }
         }
