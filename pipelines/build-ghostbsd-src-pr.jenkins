@@ -1,0 +1,33 @@
+pipeline {
+    agent { label 'builder1' }
+
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage('Clean') {
+            steps {
+                sh 'make clean'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'make -j24 buildworld buildkernel'
+            }
+        }
+    }
+
+    post {
+        success {
+            githubNotify status: 'SUCCESS', description: 'Build passed'
+        }
+        failure {
+            githubNotify status: 'FAILURE', description: 'Build failed'
+        }
+        aborted {
+            githubNotify status: 'ERROR', description: 'Build aborted'
+        }
+    }
+}
