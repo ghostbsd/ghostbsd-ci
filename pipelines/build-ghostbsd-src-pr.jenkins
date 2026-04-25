@@ -1,14 +1,7 @@
-def customWs
-
-node('builder1') {
-    customWs = env.WORKSPACE.replaceAll('%2F', '-').replaceAll('%23', '-')
-}
-
 pipeline {
     agent {
         node {
             label 'builder1'
-            customWorkspace customWs
         }
     }
 
@@ -32,9 +25,7 @@ pipeline {
 
     post {
         success {
-            ws(customWs) {
-                deleteDir()
-            }
+            deleteDir()
         }
     }
 }
