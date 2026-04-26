@@ -9,23 +9,27 @@ pipeline {
         timestamps()
     }
 
+    environment {
+        PORTS_NAME = "${env.JOB_BASE_NAME}".replace('-', '_')
+    }
+
     stages {
         stage('Create Ports Tree') {
             steps {
-                sh "poudriere ports -c -p ${env.JOB_BASE_NAME} -m null -M ${env.WORKSPACE}"
+                sh "poudriere ports -c -p ${env.PORTS_NAME} -m null -M ${env.WORKSPACE}"
             }
         }
 
         stage('Dry Run') {
             steps {
-                sh "poudriere bulk -an -j ghostbsd-15 -p ${env.JOB_BASE_NAME}"
+                sh "poudriere bulk -an -j ghostbsd-15 -p ${env.PORTS_NAME}"
             }
         }
     }
 
     post {
         always {
-            sh "poudriere ports -d -p ${env.JOB_BASE_NAME}"
+            sh "poudriere ports -d -p ${env.PORTS_NAME}"
         }
     }
 }
