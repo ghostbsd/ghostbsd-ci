@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Create Ports Tree') {
             steps {
-                sh "poudriere ports -c -p ${env.JOB_BASE_NAME} -m git -U https://github.com/ghostbsd/ghostbsd-ports.git -B ${env.BRANCH_NAME}"
+                sh "poudriere ports -c -p ${env.JOB_BASE_NAME} -m null -M ${env.WORKSPACE}"
             }
         }
 
