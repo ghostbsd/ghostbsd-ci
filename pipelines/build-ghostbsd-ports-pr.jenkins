@@ -1,0 +1,31 @@
+pipeline {
+    agent {
+        node {
+            label 'builder1'
+        }
+    }
+
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage('Create Ports Tree') {
+            steps {
+                sh "poudriere ports -c -p ${env.JOB_BASE_NAME} -m git -U https://github.com/ghostbsd/ghostbsd-ports.git -B ${env.BRANCH_NAME}"
+            }
+        }
+
+        stage('Dry Run') {
+            steps {
+                sh "poudriere bulk -an -j ghostbsd-15 -p ${env.JOB_BASE_NAME}"
+            }
+        }
+    }
+
+    post {
+        always {
+            sh "poudriere ports -d -p ${env.JOB_BASE_NAME}"
+        }
+    }
+}
