@@ -5,6 +5,8 @@ import sys
 import os
 import requests
 
+RELEASE = '26.1-R15.0p2'
+
 # GitHub GraphQL endpoint
 API_URL = "https://api.github.com/graphql"
 
@@ -179,9 +181,6 @@ def categorize_item(type_name):
     if type_name in ['Epic']:
         return 'Epic'
     return 'Feature'
-
-
-RELEASE = '26.01-R15.0p2'
 
 EPIC = '<h3>Epics</h3>\n<ul>\n'
 FEATURE = '<h3>Enhancement, Improvements and New Features</h3>\n<ul>\n'
