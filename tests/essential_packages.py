@@ -4,10 +4,11 @@ import pytest
 import re
 import requests
 
-# Get version from environment variable, default to '14'
+# Get version from environment variable, default to '15'
 version = os.environ.get('GHOSTBSD_VERSION', '15')
+ports_name = os.environ.get('PORTS_NAME', 'ghostbsd_ports')
 
-repos = f'/usr/local/poudriere/data/packages/ghostbsd-{version}-ghostbsd_ports/.latest/All'
+repos = f'/usr/local/poudriere/data/packages/ghostbsd-{version}-{ports_name}/.latest/All'
 raw_url = 'https://raw.githubusercontent.com/ghostbsd/ghostbsd-build/master/packages'
 mate_iso_packages = requests.get(f'{raw_url}/mate').text.split()
 mate_oem_iso_packages = requests.get(f'{raw_url}/mate_oem').text.split()

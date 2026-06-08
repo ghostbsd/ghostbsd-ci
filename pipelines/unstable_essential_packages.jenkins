@@ -2,6 +2,7 @@ pipeline {
   agent { label 'builder1' }
   environment {
     GHOSTBSD_VERSION = 'unstable'
+    PORTS_NAME = 'unstable_ports'
   }
   stages {
     stage('start test essential packages') {
