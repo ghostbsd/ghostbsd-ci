@@ -17,12 +17,6 @@ pipeline {
         sh "cp /usr/local/ghostbsd-build/iso/* artifacts/"
       }
     }
-    stage('Build GhostBSD MATE with new installer from unstable packages') {
-      steps {
-        sh "cd ghostbsd-build ; ./build.sh -d mate_oem -b unstable"
-        sh "cp /usr/local/ghostbsd-build/iso/* artifacts/"
-      }
-    }
     stage('Build GhostBSD XFCE from unstable packages') {
       steps {
         sh "cd ghostbsd-build ; ./build.sh -d xfce -b unstable"
