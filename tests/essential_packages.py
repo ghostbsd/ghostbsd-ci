@@ -11,7 +11,6 @@ ports_name = os.environ.get('PORTS_NAME', 'ghostbsd_ports')
 repos = f'/usr/local/poudriere/data/packages/ghostbsd-{version}-{ports_name}/.latest/All'
 raw_url = 'https://raw.githubusercontent.com/ghostbsd/ghostbsd-build/master/packages'
 mate_iso_packages = requests.get(f'{raw_url}/mate').text.split()
-mate_oem_iso_packages = requests.get(f'{raw_url}/mate_oem').text.split()
 xfce_iso_packages = requests.get(f'{raw_url}/xfce').text.split()
 gershwin_iso_packages = requests.get(f'{raw_url}/gershwin').text.split()
 common_iso_packages = requests.get(f'{raw_url}/common').text.split()
@@ -27,12 +26,6 @@ def verify_package_exists(package):
 
 
 @pytest.mark.parametrize('package', mate_iso_packages)
-def test_verify_ghostbsd_packages_iso_exists(package):
-    verify_package_exists(package)
-
-
-# Todo: this is temporary, remove when mate_oem is removed.
-@pytest.mark.parametrize('package', mate_oem_iso_packages)
 def test_verify_ghostbsd_packages_iso_exists(package):
     verify_package_exists(package)
 
